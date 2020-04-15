@@ -5,7 +5,6 @@ This package generates a differential robot with URDF. There are several  launch
 The robot could be moved with the rqt steering gui or with the custom included python scripts. The robot is equipped with a visual sensor.
 
 ## **FILE INFO**
----
 ### **URDF FILES**
 * diff_robot_din.urdf - geometry, collisions, inertia, transmissions, visual sensor and gazebo integration
 * diff_robo_noInertia.urdf - geometry and collisions only
