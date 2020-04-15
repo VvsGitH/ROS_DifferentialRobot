@@ -1,0 +1,131 @@
+<?xml version="1.0"?>
+<robot name="diff_robot" 
+  xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+  <!--MATERIALS-->
+  <material name="blue">
+    <color rgba="0 0 0.8 1" />
+  </material>
+  <material name="green">
+    <color rgba="0 0.8 0 1" />
+  </material>
+  <material name="red">
+    <color rgba="0.8 0 0 1" />
+  </material>
+  <material name="black">
+    <color rgba="0 0 0 1" />
+  </material>
+  <material name="white">
+    <color rgba="1 1 1 1" />
+  </material>
+
+  <!--XACRO PROPERTIES - SHAPE PARAMETERS-->
+  <xacro:property name="base_l" value="0.02" />
+  <xacro:property name="base_r" value="0.15" />
+  <xacro:property name="wheel_r" value="0.04" />
+  <xacro:property name="castor_r" value="0.025" />
+  <!--XACRO PROPERTIES - POSITIONAL PARAMETERS-->
+  <xacro:property name="wheel_rpy" value="1.57 0 0" />
+  <xacro:property name="wheel_xyz" value="0 0 0" />
+  <xacro:property name="castor_fr_xyz" value="0 0.02 0" />
+  <xacro:property name="castor_bk_xyz" value="0.02 0.02 0" />
+  <!--XACRO MACRO - BASE LINK GEOMETRY-->
+  <xacro:macro name="base_geom">
+    <geometry>
+      <cylinder length="${base_l}" radius="${base_r}" />
+    </geometry>
+  </xacro:macro>
+  <!--XACRO MACRO - STANDARD WHEEL GEOMETRY-->
+  <xacro:macro name="wheel_geom">
+    <origin rpy="${wheel_rpy}" xyz="${wheel_xyz}" />
+    <geometry>
+      <cylinder length="${base_l}" radius="${wheel_r}" />
+    </geometry>
+  </xacro:macro>
+  <!--XACRO MACRO - CASTOR WHEEL GEOMETRY-->
+  <xacro:macro name="castor_geom">
+    <geometry>
+      <sphere radius="${castor_r}" />
+    </geometry>
+  </xacro:macro>
+
+  <!--LINK DEFINITIONS-->
+  <link name="base_link">
+    <visual>
+      <xacro:base_geom />
+      <material name="white" />
+    </visual>
+    <collision>
+      <xacro:base_geom />
+    </collision>
+  </link>
+  <link name="right_wheel">
+    <visual>
+      <xacro:wheel_geom />
+      <material name="blue" />
+    </visual>
+    <collision>
+      <xacro:wheel_geom />
+    </collision>
+  </link>
+  <link name="left_wheel">
+    <visual>
+      <xacro:wheel_geom />
+      <material name="blue" />
+    </visual>
+    <collision>
+      <xacro:wheel_geom />
+    </collision>
+  </link>
+  <link name="castor_front_wheel">
+    <visual>
+      <origin rpy="${wheel_rpy}" xyz="${castor_fr_xyz}" />
+      <xacro:castor_geom />
+      <material name="red" />
+    </visual>
+    <collision>
+      <origin rpy="${wheel_rpy}" xyz="${castor_fr_xyz}" />
+      <xacro:castor_geom />
+    </collision>
+  </link>
+  <link name="castor_back_wheel">
+    <visual>
+      <origin rpy="${wheel_rpy}" xyz="${castor_bk_xyz}" />
+      <xacro:castor_geom />
+      <material name="red" />
+    </visual>
+    <collision>
+      <origin rpy="${wheel_rpy}" xyz="${castor_bk_xyz}" />
+      <xacro:castor_geom />
+    </collision>
+  </link>
+
+  <!--JOINT DEFINITIONS-->
+  <joint name="right_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="right_wheel" />
+    <origin rpy="0 0 0" xyz="0.0 0.15 0.0" />
+    <axis rpy="0 0 0" xyz="0 1 0" />
+    <limit effort="100.0" velocity="100" />
+  </joint>
+  <joint name="left_wheel_joint" type="continuous">
+    <parent link="base_link" />
+    <child link="left_wheel" />
+    <origin rpy="0 0 0" xyz="0.0 -0.15 0.0" />
+    <axis rpy="0 0 0" xyz="0 1 0" />
+    <limit effort="100.0" velocity="100" />
+  </joint>
+  <joint name="castor_frwheel_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="castor_front_wheel" />
+    <origin rpy="-1.57 0 0" xyz="0.115 0.0 0.007" />
+  </joint>
+  <joint name="castor_bkwheel_joint" type="fixed">
+    <parent link="base_link" />
+    <child link="castor_back_wheel" />
+    <origin rpy="-1.57 0 0" xyz="-0.135 0.0 0.009" />
+  </joint>
+
+
+</robot>

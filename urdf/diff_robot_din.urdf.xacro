@@ -1,0 +1,124 @@
+<?xml version="1.0"?>
+<robot name="diff_robot" 
+    xmlns:xacro="http://ros.org/wiki/xacro">
+
+
+    <!-- XACRO LIBRARIES-->
+    <xacro:include filename="$(find diff_robot)/urdf/cylinder_wheel.urdf.xacro" />
+    <xacro:include filename="$(find diff_robot)/urdf/visual_sensor.xacro" />
+
+    <!--MATERIALS-->
+    <material name="blue">
+        <color rgba="0 0 0.8 1" />
+    </material>
+    <material name="green">
+        <color rgba="0 0.8 0 1" />
+    </material>
+    <material name="red">
+        <color rgba="0.8 0 0 1" />
+    </material>
+    <material name="black">
+        <color rgba="0 0 0 1" />
+    </material>
+    <material name="white">
+        <color rgba="1 1 1 1" />
+    </material>
+
+    <!--XACRO PROPERTIES - SHAPE PARAMETERS-->
+    <xacro:property name="base_l" value="0.02" />
+    <xacro:property name="base_r" value="0.15" />
+    <xacro:property name="base_m" value="5" />
+    <xacro:property name="castor_r" value="0.025" />
+    <xacro:property name="castor_m" value="0.5" />
+    <!--XACRO PROPERTIES - POSITIONAL PARAMETERS-->
+    <xacro:property name="castor_rpy" value="1.57 0 0" />
+    <xacro:property name="castor_fr_xyz" value="0 0.02 0" />
+    <xacro:property name="castor_bk_xyz" value="0.02 0.02 0" />
+    <!--XACRO MACRO - BASE LINK GEOMETRY-->
+    <xacro:macro name="base_geom">
+        <geometry>
+            <cylinder length="${base_l}" radius="${base_r}" />
+        </geometry>
+    </xacro:macro>
+    <!--XACRO MACRO - CASTOR WHEEL GEOMETRY-->
+    <xacro:macro name="castor_geom">
+        <geometry>
+            <sphere radius="${castor_r}" />
+        </geometry>
+    </xacro:macro>
+    <!--XACRO MACRO - CASTOR INERTIA-->
+    <xacro:macro name="castor_inertial">
+        <inertial>
+            <mass value="${castor_m}" />
+            <inertia ixx="0.0001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
+        </inertial>
+    </xacro:macro>
+
+    <!--LINKS DEFINITION-->
+    <link name="base_link">
+        <visual>
+            <xacro:base_geom />
+            <material name="white" />
+        </visual>
+        <collision>
+            <xacro:base_geom />
+        </collision>
+        <inertial>
+            <mass value="${base_m}" />
+            <origin xyz="0 0 0" />
+            <xacro:cylinder_inertial m="${base_m}" r="${base_r}" h="${base_l}" />
+        </inertial>
+    </link>
+    <link name="castor_front_wheel">
+        <visual>
+            <origin rpy="${castor_rpy}" xyz="${castor_fr_xyz}" />
+            <xacro:castor_geom />
+            <material name="red" />
+        </visual>
+        <collision>
+            <origin rpy="${castor_rpy}" xyz="${castor_fr_xyz}" />
+            <xacro:castor_geom />
+        </collision>
+        <xacro:castor_inertial />
+    </link>
+    <link name="castor_back_wheel">
+        <visual>
+            <origin rpy="${castor_rpy}" xyz="${castor_bk_xyz}" />
+            <xacro:castor_geom />
+            <material name="red" />
+        </visual>
+        <collision>
+            <origin rpy="${castor_rpy}" xyz="${castor_bk_xyz}" />
+            <xacro:castor_geom />
+        </collision>
+        <xacro:castor_inertial />
+
+    </link>
+
+    <!--JOINTS DEFINITION-->
+    <joint name="castor_frwheel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="castor_front_wheel" />
+        <origin rpy="-1.57 0 0" xyz="0.115 0.0 0.007" />
+    </joint>
+    <joint name="castor_bkwheel_joint" type="fixed">
+        <parent link="base_link" />
+        <child link="castor_back_wheel" />
+        <origin rpy="-1.57 0 0" xyz="-0.135 0.0 0.009" />
+    </joint>
+
+    <!--WHEELS DEFINITION-->
+    <xacro:cylinder_wheel fb="front" lr="right" parent="base_link" translateX="0" translateY="0.5" flipY="1" />
+    <xacro:cylinder_wheel fb="front" lr="left" parent="base_link" translateX="0" translateY="-0.5" flipY="1" />
+
+    <!--VISUAL SENSOR-->
+    <xacro:hokuyo base_radius="${base_r}" base_height="${base_l}" />
+
+    <!-- Gazebo plugin for ROS Control -->
+    <gazebo>
+        <plugin name="gazebo_ros_control" filename="libgazebo_ros_control.so">
+            <robotNamespace>/</robotNamespace>
+        </plugin>
+    </gazebo>
+
+</robot>
